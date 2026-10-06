@@ -1,0 +1,62 @@
+# Конфигурация ruff для модуля fastapi/auth (рефакторинг).
+# Локальная (scoped) настройка: применяется к fastapi/auth/ и fastapi/auth/tests/.
+target-version = "py312"
+line-length = 88
+
+[lint]
+preview = true
+select = [
+    "E",      # pycodestyle errors (включая PEP8)
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes — неиспользуемые импорты, неопределённые имена
+    "I",      # isort — порядок импортов
+    "UP",     # pyupgrade — современный синтаксис Python
+    "B",      # flake8-bugbear — типичные ошибки
+    "SIM",    # flake8-simplify — упрощение выражений
+    "C4",     # flake8-comprehensions — стиль comprehensions
+    "RUF",    # ruff-specific
+    "ANN",    # аннотации типов (правила из корневого pyproject.toml)
+    "D",      # docstring-стиль (правила из корневого pyproject.toml)
+    "DOC",    # содержимое docstring (правила из корневого pyproject.toml)
+]
+ignore = [
+    "incorrect-blank-line-before-class",   # отступ/пустая строка перед docstring класса (как в корневом конфиге)
+    "multi-line-summary-second-line",   # summary docstring на первой строке (как в корневом конфиге)
+    # Проект русскоязычный: кириллица в docstring/строках/комментариях — норма,
+    # а не «двусмысленные» символы, похожие на ASCII.
+    "ambiguous-unicode-character-string",
+    "ambiguous-unicode-character-docstring",
+    "ambiguous-unicode-character-comment",
+    # Используем универсальные `# noqa: CODE` вместо ruff-специфичных
+    # `# ruff: ignore[...]`, чтобы их понимали и flake8/pycodestyle.
+    "noqa-comments",
+]
+
+[lint.pydocstyle]
+convention = "google"
+
+[lint.isort]
+known-first-party = [
+    "auth",
+    "database",
+    "helpers",
+    "models",
+    "request_logging",
+    "routers",
+    "schemas",
+    "videopc_logging",
+]
+
+[lint.flake8-bugbear]
+# FastAPI-идиома: значения по умолчанию вида `x = Depends(...)`, `Form(...)` и т.п.
+# Это не изменяемые объекты-аргументы, а декларация DI — разрешаем их для B008.
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Header",
+    "fastapi.Cookie",
+    "fastapi.Form",
+    "fastapi.File",
+]
